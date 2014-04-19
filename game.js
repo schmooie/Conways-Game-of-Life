@@ -29,13 +29,15 @@ GameOfLife.prototype.coordinateHelper = function(coordArr) {
   }
 };
 
-GameOfLife.prototype.setupBoardEvents = function() {  
+GameOfLife.prototype.setupBoardEvents = function() { 
+
+  var board = this; 
   var onCellClick = function (e) {
     // coordinates of cell, in case you need them
     var coord_array = this.id.split('-');
     var coord_hash = {x: coord_array[0], y: coord_array[1]};
     
-    this.style.backgroundColor = this.getRandomColor();
+    this.style.backgroundColor = board.getRandomColor();
   };
 
    var rows = document.getElementById('board').children[0].children[0].rows;
