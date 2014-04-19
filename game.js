@@ -29,27 +29,13 @@ GameOfLife.prototype.coordinateHelper = function(coordArr) {
   }
 };
 
-GameOfLife.prototype.setupBoardEvents = function() {
-  // each board cell has an CSS id in the format of: "x-y" 
-  // where x is the x-coordinate and y the y-coordinate
-  // use this fact to loop through all the ids and assign
-  // them "on-click" events that allow a user to click on 
-  // cells to setup the initial state of the game
-  // before clicking "Step" or "Auto-Play"
-  
-  // clicking on a cell should toggle the cell between "alive" & "dead"
-  // for ex: an "alive" cell be colored "blue", a dead cell could stay white
-  
-  // for example, here is how we would catch a click event on just the 0-0 cell
-  // you need to do something like this for EVERY cell 
-  
+GameOfLife.prototype.setupBoardEvents = function() {  
   var onCellClick = function (e) {
     // coordinates of cell, in case you need them
     var coord_array = this.id.split('-');
     var coord_hash = {x: coord_array[0], y: coord_array[1]};
     
-    // how to set the style of the cell when it's clicked
-    this.style.backgroundColor = "rgb(204, 51, 51)";
+    this.style.backgroundColor = this.getRandomColor();
   };
 
    var rows = document.getElementById('board').children[0].children[0].rows;
@@ -72,38 +58,32 @@ GameOfLife.prototype.clear = function() {
 };
 
 GameOfLife.prototype.step = function () {
-  // Here is where you want to loop through all the cells
-  // on the board and determine, based on it's neighbors,
-  // whether the cell should be dead or alive in the next
-  // evolution of the game
-
   var aliveColor = "rgb(204, 51, 51)",
-      aliveColors = ["rgb(204, 51, 51)", "rgb(204, 51, 128)","rgb(204, 128, 51)"],
+      aliveColors = ["rgb(255, 118, 0)", "rgb(255, 152, 64)","rgb(255, 180, 115)", "rgb(1, 147, 154)"],
       deadColor = "rgb(255, 255, 255)",
       rows = document.getElementById('board').children[0].children[0].rows,
+      alreadyLiving = [],
       makeItLive = [],
       makeItDead = [];
 
-  var getRandomColor = function () {
-    return aliveColors[Math.floor(Math.random() * 3)];
-  };
+    // 1 = staying alive
+    // 2 = becoming alive
+    // 3 = dead
 
   for (var i = 0; i < rows.length; i++) {
     var cells = rows[i].cells;
     for (var j = 0; j < cells.length; j++) {
-      if (isStayingAlive(cells[j])) {
+      if (isStayingAlive(cells[j]) === 2) {
         makeItLive.push(cells[j]);
-        // cells[j].style.backgroundColor = aliveColor;
-      } else {
+      } else if (isStayingAlive(cells[j]) === 3) {
         makeItDead.push(cells[j])
-        // cells[j].style.backgroundColor = deadColor;
       }
     }
   }
 
   // asynchronous bullshit
   for (var k = 0; k < makeItLive.length; k++) {
-    makeItLive[k].style.backgroundColor = aliveColor;
+    makeItLive[k].style.backgroundColor = this.getRandomColor();
   }
 
   for (var l = 0; l < makeItDead.length; l++) {
@@ -114,13 +94,20 @@ GameOfLife.prototype.step = function () {
     var cellCoordinates = cell.id.split('-'), // cellCoordinates[0]: x , cellCoordinates[1]: y
         aliveNeighbors = 0,
         neighbors = [],
-        currentlyAlive;
+        currentlyAlive = false;
 
-    if (cell.style.backgroundColor === aliveColor) {
-      currentlyAlive = true;
-    } else {
-      currentlyAlive = false;
+    for (var y = 0; y < aliveColors.length; y++){
+      if (cell.style.backgroundColor === aliveColors[y]) {
+        currentlyAlive = true;
+      }
     }
+
+    // if (cell.style.backgroundColor === aliveColor) {
+    //   currentlyAlive = true;
+    // } else if () 
+    // else {
+    //   currentlyAlive = false;
+    // }
 
     // populate neighbors array 
 
@@ -141,22 +128,37 @@ GameOfLife.prototype.step = function () {
     // bottom right
     neighbors.push((parseInt(cellCoordinates[0]) + 1) + '-' + (parseInt(cellCoordinates[1]) + 1));
 
+
+    // for (var i = 0; i < neighbors.length; i++) {
+    //   if (document.getElementById(neighbors[i]) && (document.getElementById(neighbors[i]).style.backgroundColor === aliveColor)) {
+    //     aliveNeighbors++;
+    //   }
+    // }
+
     for (var i = 0; i < neighbors.length; i++) {
-      if (document.getElementById(neighbors[i]) && (document.getElementById(neighbors[i]).style.backgroundColor === aliveColor)) {
-        aliveNeighbors++;
+      if (document.getElementById(neighbors[i])) {
+        for (var x = 0; x < aliveColors.length; x++) {
+          if (document.getElementById(neighbors[i]).style.backgroundColor === aliveColors[x]) {
+            aliveNeighbors++;
+          }
+        }
       }
     }
 
+
+    // 1 = staying alive
+    // 2 = becoming alive
+    // 3 = dead
     if (currentlyAlive && (aliveNeighbors > 3)) {
-      return false;
+      return 3;
     } else if (currentlyAlive && (aliveNeighbors < 2)) {
-      return false;
+      return 3;
     } else if (currentlyAlive === false && aliveNeighbors === 3) {
-      return true;
+      return 2;
     } else if (currentlyAlive === false) {
-      return false;
+      return 3;
     } else {
-      return true;
+      return 1;
     }
   } // end of StayingAlive function
 };
@@ -167,12 +169,17 @@ GameOfLife.prototype.randomize = function() {
   for (var i = 0; i < rows.length; i++) {
     var cells = rows[i].cells;
     for (var j = 0; j < cells.length; j++) {
-      var oneThroughFour = Math.random() * 3 + 1;
-      if (oneThroughFour > 3) {
-        cells[j].style.backgroundColor = "rgb(204, 51, 51)";
+      var oneThroughSeven = Math.random() * 7 + 1;
+      if (oneThroughSeven > 6) {
+        cells[j].style.backgroundColor = this.getRandomColor();
       }
     } 
   }
+};
+
+GameOfLife.prototype.getRandomColor = function() {
+  var aliveColors = ["rgb(255, 118, 0)", "rgb(255, 152, 64)","rgb(255, 180, 115)", "rgb(1, 147, 154)"];
+  return aliveColors[Math.floor(Math.random() * 4)];
 };
 
 
