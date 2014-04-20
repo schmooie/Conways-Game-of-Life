@@ -1,12 +1,29 @@
 function GameOfLife(width,height) {
   this.width = width;
   this.height = height;
+  this.alive = {_Colors: ["rgb(239, 89, 123)", "rgb(255, 109, 49)","rgb(115, 182, 107)", "rgb(255, 203, 24)", "rgb(41, 162, 198)"]};
+  this.deadColor = "rgb(255, 255, 255)";
 }
+
+GameOfLife.prototype.getCells = function() {
+	var arrayOfCells = [],
+			rows = document.getElementById('board').children[0].children[0].rows;
+	for (var i = 0; i < rows.length; i++) {
+  	var cells = rows[i].cells;
+		for (var j = 0; j < cells.length; j++) {
+    	arrayOfCells.push(cells[j]);
+  	}
+   }
+  return arrayOfCells;
+};
+
+GameOfLife.prototype.getRandomColor = function() {
+  return this.alive._Colors[Math.floor(Math.random() * 5)];
+};
 
 GameOfLife.prototype.createAndShowBoard = function () {
   var goltable = document.createElement("table");
   var tablehtml = '';
-  
   for (var h=0; h<this.height; h++) {
     tablehtml += "<tr id='row+" + h + "'>";
     for (var w=0; w<this.width; w++) {
@@ -14,74 +31,42 @@ GameOfLife.prototype.createAndShowBoard = function () {
     }
     tablehtml += "</tr>";
   }
-  
   goltable.innerHTML = tablehtml;
   var board = document.getElementById('board');
   board.appendChild(goltable);
   this.setupBoardEvents();
 };
 
-GameOfLife.prototype.coordinateHelper = function(coordArr) {
-  if(coordArr) {
-    return {x: coordArr[0], y: coordArr[1]};
-  } else {
-    return false;
-  }
-};
-
 GameOfLife.prototype.setupBoardEvents = function() { 
+  var board = this, 
+  		cells = this.getCells();
 
-  var board = this; 
   var onCellClick = function (e) {
-    // coordinates of cell, in case you need them
-    var coord_array = this.id.split('-');
-    var coord_hash = {x: coord_array[0], y: coord_array[1]};
-    
     this.style.backgroundColor = board.getRandomColor();
   };
 
-   var rows = document.getElementById('board').children[0].children[0].rows;
-   for (var i = 0; i < rows.length; i++) {
-    var cells = rows[i].cells;
-    for (var j = 0; j < cells.length; j++) {
-      cells[j].onclick = onCellClick;
-    }
-   }
-};
-
-GameOfLife.prototype.clear = function() {
-  var rows = document.getElementById('board').children[0].children[0].rows;
-  for (var i = 0; i < rows.length; i++) {
-    var cells = rows[i].cells;
-    for (var j = 0; j < cells.length; j++) {
-      cells[j].style.backgroundColor = "rgb(255, 255, 255)";
-    }
-  }  
+  for (var i = 0; i < cells.length; i++) {
+  	cells[i].onclick = onCellClick;
+  }
 };
 
 GameOfLife.prototype.step = function () {
-  var aliveColor = "rgb(204, 51, 51)",
-      aliveColors = ["rgb(255, 118, 0)", "rgb(255, 152, 64)","rgb(255, 180, 115)", "rgb(1, 147, 154)"],
-      deadColor = "rgb(255, 255, 255)",
-      rows = document.getElementById('board').children[0].children[0].rows,
-      alreadyLiving = [],
-      makeItLive = [],
-      makeItDead = [];
+  var makeItLive = [],
+      makeItDead = [],
+      board = this,
+      cells = this.getCells();
 
     // 1 = staying alive
     // 2 = becoming alive
     // 3 = dead
 
-  for (var i = 0; i < rows.length; i++) {
-    var cells = rows[i].cells;
-    for (var j = 0; j < cells.length; j++) {
-      if (isStayingAlive(cells[j]) === 2) {
-        makeItLive.push(cells[j]);
-      } else if (isStayingAlive(cells[j]) === 3) {
-        makeItDead.push(cells[j])
-      }
-    }
-  }
+  for (var j = 0; j < cells.length; j++) {
+	  if (isStayingAlive(cells[j]) === 2) {
+	    makeItLive.push(cells[j]);
+	  } else if (isStayingAlive(cells[j]) === 3) {
+	    makeItDead.push(cells[j])
+	  }
+	}
 
   // asynchronous bullshit
   for (var k = 0; k < makeItLive.length; k++) {
@@ -89,7 +74,7 @@ GameOfLife.prototype.step = function () {
   }
 
   for (var l = 0; l < makeItDead.length; l++) {
-    makeItDead[l].style.backgroundColor = deadColor;
+    makeItDead[l].style.backgroundColor = this.deadColor;
   }
 
   function isStayingAlive (cell) {
@@ -98,21 +83,11 @@ GameOfLife.prototype.step = function () {
         neighbors = [],
         currentlyAlive = false;
 
-    for (var y = 0; y < aliveColors.length; y++){
-      if (cell.style.backgroundColor === aliveColors[y]) {
-        currentlyAlive = true;
-      }
+  for (var y = 0; y < board.alive._Colors.length; y++){
+    if (cell.style.backgroundColor === board.alive._Colors[y]) {
+      currentlyAlive = true;
     }
-
-    // if (cell.style.backgroundColor === aliveColor) {
-    //   currentlyAlive = true;
-    // } else if () 
-    // else {
-    //   currentlyAlive = false;
-    // }
-
-    // populate neighbors array 
-
+  }
     // top left
     neighbors.push((parseInt(cellCoordinates[0]) - 1) + '-' + (parseInt(cellCoordinates[1]) - 1));
     // top center
@@ -130,27 +105,21 @@ GameOfLife.prototype.step = function () {
     // bottom right
     neighbors.push((parseInt(cellCoordinates[0]) + 1) + '-' + (parseInt(cellCoordinates[1]) + 1));
 
-
-    // for (var i = 0; i < neighbors.length; i++) {
-    //   if (document.getElementById(neighbors[i]) && (document.getElementById(neighbors[i]).style.backgroundColor === aliveColor)) {
-    //     aliveNeighbors++;
-    //   }
-    // }
-
     for (var i = 0; i < neighbors.length; i++) {
-      if (document.getElementById(neighbors[i])) {
-        for (var x = 0; x < aliveColors.length; x++) {
-          if (document.getElementById(neighbors[i]).style.backgroundColor === aliveColors[x]) {
+    	var neighbor = document.getElementById(neighbors[i]);
+      if (neighbor) {
+        for (var j = 0; j < board.alive._Colors.length; j++) {
+          if (neighbor.style.backgroundColor === board.alive._Colors[j]) {
             aliveNeighbors++;
           }
         }
       }
     }
 
-
     // 1 = staying alive
     // 2 = becoming alive
     // 3 = dead
+
     if (currentlyAlive && (aliveNeighbors > 3)) {
       return 3;
     } else if (currentlyAlive && (aliveNeighbors < 2)) {
@@ -163,6 +132,16 @@ GameOfLife.prototype.step = function () {
       return 1;
     }
   } // end of StayingAlive function
+};
+
+GameOfLife.prototype.clear = function() {
+  var rows = document.getElementById('board').children[0].children[0].rows;
+  for (var i = 0; i < rows.length; i++) {
+    var cells = rows[i].cells;
+    for (var j = 0; j < cells.length; j++) {
+      cells[j].style.backgroundColor = this.deadColor;
+    }
+  }  
 };
 
 GameOfLife.prototype.randomize = function() {
@@ -178,13 +157,6 @@ GameOfLife.prototype.randomize = function() {
     } 
   }
 };
-
-GameOfLife.prototype.getRandomColor = function() {
-  var aliveColors = ["rgb(255, 118, 0)", "rgb(255, 152, 64)","rgb(255, 180, 115)", "rgb(1, 147, 154)"];
-  return aliveColors[Math.floor(Math.random() * 4)];
-};
-
-
 
 startGame = function () {
   var width = prompt("How wide should the board be?");
@@ -210,6 +182,7 @@ startGame = function () {
   };
 
   window.clearBoard = function () {
+    window.pause();
     gol.clear();
   };
 
@@ -220,3 +193,8 @@ startGame = function () {
 };
 
 startGame();
+// add in a box that shows you how many cells are currently alive
+// how many steps have gone by
+// what was the peak amount of alive cells
+// slider for speed of autoplay
+// form for window size
