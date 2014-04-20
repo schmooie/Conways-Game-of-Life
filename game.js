@@ -2,7 +2,8 @@ function GameOfLife(width,height) {
   this.width = width;
   this.height = height;
   this.alive = {_Colors: ["rgb(239, 89, 123)", "rgb(255, 109, 49)","rgb(115, 182, 107)", "rgb(255, 203, 24)", "rgb(41, 162, 198)"]};
-  this.deadColor = "rgb(255, 255, 255)";
+  this.deadColor = "rgb(255, 255, 255)",
+  this.cellsAlive = 0;
 }
 
 GameOfLife.prototype.getCells = function() {
@@ -43,6 +44,7 @@ GameOfLife.prototype.setupBoardEvents = function() {
 
   var onCellClick = function (e) {
     this.style.backgroundColor = board.getRandomColor();
+    // board.cellsAlive++;
   };
 
   for (var i = 0; i < cells.length; i++) {
@@ -76,6 +78,8 @@ GameOfLife.prototype.step = function () {
   for (var l = 0; l < makeItDead.length; l++) {
     makeItDead[l].style.backgroundColor = this.deadColor;
   }
+
+  // board.cellsAlive = cells.length - makeItDead.length;
 
   function isStayingAlive (cell) {
     var cellCoordinates = cell.id.split('-'), // cellCoordinates[0]: x , cellCoordinates[1]: y
@@ -116,10 +120,6 @@ GameOfLife.prototype.step = function () {
       }
     }
 
-    // 1 = staying alive
-    // 2 = becoming alive
-    // 3 = dead
-
     if (currentlyAlive && (aliveNeighbors > 3)) {
       return 3;
     } else if (currentlyAlive && (aliveNeighbors < 2)) {
@@ -159,10 +159,20 @@ GameOfLife.prototype.randomize = function() {
 };
 
 startGame = function () {
-  var width = prompt("How wide should the board be?");
-  var height = prompt("And how tall should the board be?");
-  var gol = new GameOfLife(width,height);
-  gol.createAndShowBoard();
+  var gol;
+
+  window.setWidthAndHeight = function () {
+    var form = document.forms[0],
+        height = parseInt(form[0].value),
+        width = parseInt(form[1].value);
+    if (gol) {
+      return false;
+    } else {
+      gol = new GameOfLife(width, height);
+      gol.createAndShowBoard();
+    }
+    return false;
+  };
 
   window.step = function () {
     gol.step();
@@ -189,7 +199,6 @@ startGame = function () {
   window.randomize = function () {
     gol.randomize();
   };
-
 };
 
 startGame();

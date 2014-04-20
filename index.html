@@ -9,15 +9,33 @@
 </head>
 
 <body>
-  <h2>Game of Life</h2>
-  <table id='board'></table>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Game of Life</h2>
+        <table id='board'></table>
+      </div>
+
+    </div>
   
-  <div id='control_panel'>
-    <button class='btn btn-success' onclick='step()'>Step</button>
-    <button class='btn btn-primary' onclick='autoplay()'>Auto-Play</button>
-    <button class='btn btn-danger' onclick='pause()'>Pause</button>
-    <button class='btn btn-warning' onclick='randomize()'>Reset Random</button>
-    <button class='btn btn-info' onclick='clearBoard()'>Clear</button>
+    <div class="row">
+      <div class="col-md-12">
+        <div class='control_panel'>
+          <button class='btn btn-success' onclick='step()'>Step</button>
+          <button class='btn btn-primary' onclick='autoplay()'>Auto-Play</button>
+          <button class='btn btn-danger' onclick='pause()'>Pause</button>
+          <button class='btn btn-warning' onclick='randomize()'>Reset Random</button>
+          <button class='btn btn-info' onclick='clearBoard()'>Clear</button>
+        </div>
+        <div class='control_panel'>
+          <form>
+            <input type="text" id="height" placeholder="Height of Board">
+            <input type="text" id="width" placeholder="Width of Board">
+            <input type="submit" class="btn btn-success" onclick='return setWidthAndHeight()'>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
   
   <script src="game.js"></script>
