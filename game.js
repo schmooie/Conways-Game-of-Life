@@ -2,7 +2,7 @@ function GameOfLife(width,height) {
   this.width = width;
   this.height = height;
   this.alive = {_Colors: ["rgb(239, 89, 123)", "rgb(255, 109, 49)","rgb(115, 182, 107)", "rgb(255, 203, 24)", "rgb(41, 162, 198)"]};
-  this.deadColor = "rgb(255, 255, 255)",
+  this.deadColor = "rgb(240, 240, 240)",
   this.cellsAlive = 0;
 }
 
@@ -38,8 +38,8 @@ GameOfLife.prototype.createAndShowBoard = function () {
   this.setupBoardEvents();
 };
 
-GameOfLife.prototype.setupBoardEvents = function() { 
-  var board = this, 
+GameOfLife.prototype.setupBoardEvents = function() {
+  var board = this,
   		cells = this.getCells();
 
   var onCellClick = function (e) {
@@ -141,7 +141,7 @@ GameOfLife.prototype.clear = function() {
     for (var j = 0; j < cells.length; j++) {
       cells[j].style.backgroundColor = this.deadColor;
     }
-  }  
+  }
 };
 
 GameOfLife.prototype.randomize = function() {
@@ -154,7 +154,7 @@ GameOfLife.prototype.randomize = function() {
       if (oneThroughSeven > 6) {
         cells[j].style.backgroundColor = this.getRandomColor();
       }
-    } 
+    }
   }
 };
 
@@ -182,7 +182,7 @@ startGame = function () {
 
   window.autoplay = function () {
     if (typeof automation == "undefined") {
-      automation = window.setInterval(window.step, 100);
+      automation = window.setInterval(window.step, 150);
     }
   };
 

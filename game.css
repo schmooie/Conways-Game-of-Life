@@ -1,5 +1,6 @@
 body {
   padding: 10px;
+  font-family: 'Raleway', sans-serif;
 }
 h1, h2 {
   text-align: center;
@@ -8,9 +9,10 @@ h1, h2 {
   margin: 0 auto;
 }
 #board td{
-  border: 1px solid #999;
+  border: 1px dotted #ddd;
   width: 16px;
   height: 16px;
+  background: #F0F0F0;
 }
 .control_panel {
   margin: 10px auto;
